@@ -1,20 +1,22 @@
 import datetime as dt
 import numpy as np
 import pandas as pd
-from sklearn import cross_validation, preprocessing, svm
+from sklearn import cross_validation, preprocessing
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
 def munge_data(csv_input):
     """Take train and test set and make them useable for machine learning algorithms."""
     df = pd.read_csv(csv_input)
     df['datetime'] = pd.to_datetime(df['datetime'])
-    df['Date'] = df['datetime'].dt.date.map(dt.date.toordinal)
-    df['Year'] = df['datetime'].dt.year
-    df['Month'] = df['datetime'].dt.month
-    df['Day'] = df['datetime'].dt.day
-    df['Hour'] = df['datetime'].dt.hour
+    df['date'] = df['datetime'].dt.date.map(dt.date.toordinal)
+    df['year'] = df['datetime'].dt.year
+    df['month'] = df['datetime'].dt.month
+    df['day'] = df['datetime'].dt.day
+    df['hour'] = df['datetime'].dt.hour
     df['weekday'] = df['datetime'].dt.weekday
     df['dayoff'] = (((df['weekday'] == 5) & (df['weekday'] == 6)) | (df['holiday'] == 1)).astype(int)
+    df.index = pd.DatetimeIndex(df['datetime'])
     return df
 
 
@@ -30,7 +32,7 @@ def main():
     test_df = test_df.drop(['datetime'], axis=1)
     test_data = preprocessing.scale(test_df.values)
 
-    clf = svm.SVR()
+    clf = RandomForestRegressor(random_state=1000)
     
     train_data, cv_data, target_data, cv_target_data = cross_validation.train_test_split(
         train_data, target_data, test_size=0.2, random_state=1000)
