@@ -14,6 +14,7 @@ def munge_data(csv_input):
     df['Day'] = df['datetime'].dt.day
     df['Hour'] = df['datetime'].dt.hour
     df['weekday'] = df['datetime'].dt.weekday
+    df['dayoff'] = (((df['weekday'] == 5) & (df['weekday'] == 6)) | (df['holiday'] == 1)).astype(int)
     return df
 
 
@@ -32,7 +33,7 @@ def main():
     clf = svm.SVR()
     
     train_data, cv_data, target_data, cv_target_data = cross_validation.train_test_split(
-        train_data, target_data, test_size=0.2)
+        train_data, target_data, test_size=0.2, random_state=1000)
 
     clf.fit(train_data, target_data)
     cv_predictions = clf.predict(cv_data)
