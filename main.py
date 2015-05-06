@@ -25,12 +25,14 @@ def main():
     target_df = train_df['count']
     train_df = train_df.drop(['datetime', 'casual', 'registered', 'count'], axis=1)
     test_df = munge_data('./data/test.csv')
+
+    scaler = preprocessing.StandardScaler()
     
-    train_data = preprocessing.scale(train_df.values)
+    train_data = scaler.fit_transform(train_df.values)
     target_data = target_df.values
     test_datetimes = test_df['datetime'].map(lambda ts: ts.strftime('%Y-%m-%d %H:%M:%S'))
     test_df = test_df.drop(['datetime'], axis=1)
-    test_data = preprocessing.scale(test_df.values)
+    test_data = scaler.transform(test_df.values)
 
     clf = RandomForestRegressor(random_state=1000)
     
