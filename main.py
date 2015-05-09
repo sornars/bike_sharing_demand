@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn import cross_validation, preprocessing
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
 def munge_data(csv_input):
@@ -30,7 +30,9 @@ def feature_selection(train_data, cv_data, target_data, cv_target_data):
     ax2 = ax1.twinx()
     df = pd.DataFrame({'features':[], 'r2':[], 'mse':[]})
     for i in range(1, train_data.shape[1]):
-        clf = RandomForestRegressor(max_features=i, random_state=1000)
+        ax1.cla()
+        ax2.cla()
+        clf = ExtraTreesRegressor(max_features=i, random_state=1000)
 
         clf.fit(train_data, target_data)
         cv_predictions = clf.predict(cv_data)
@@ -51,8 +53,6 @@ def feature_selection(train_data, cv_data, target_data, cv_target_data):
         for tl in ax2.get_yticklabels():
             tl.set_color('r')
         plt.draw()
-        ax1.cla()
-        ax2.cla()
 
         if mse < min_mse and r2 > max_r2:
             min_mse = mse
@@ -88,7 +88,7 @@ def main():
 
     print('Optimal number of features: {}'.format(max_features))
 
-    clf = RandomForestRegressor(max_features=max_features, random_state=1000)
+    clf = ExtraTreesRegressor(n_estimators=100, max_features=max_features, random_state=1000)
 
     clf.fit(train_data, target_data)
     cv_predictions = clf.predict(cv_data)
